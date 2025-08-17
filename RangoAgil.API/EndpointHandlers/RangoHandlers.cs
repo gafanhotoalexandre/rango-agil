@@ -56,6 +56,7 @@ public static class RangoHandlers
     public static async Task<Results<NoContent, Ok<IEnumerable<RangoDTO>>>> GetRangosAsync(
         RangoDbContext dbContext,
         IMapper mapper,
+        ILogger<RangoDTO> logger,
         [FromQuery(Name = "nome")] string? rangoNome)
     {
         var entities = await dbContext.Rangos
@@ -63,8 +64,12 @@ public static class RangoHandlers
                                 .ToListAsync();
 
         if (entities.Count <= 0)
+        {
+            logger.LogInformation($"De acordo com a busca, nenhum rango foi encontrado: {rangoNome}");
             return TypedResults.NoContent();
+        }
 
+        logger.LogInformation("Retornando rangos");
         return TypedResults.Ok(mapper.Map<IEnumerable<RangoDTO>>(entities));
     }
 

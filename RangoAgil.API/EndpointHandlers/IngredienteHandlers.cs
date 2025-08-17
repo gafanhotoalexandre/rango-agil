@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RangoAgil.API.DbContexts;
 using RangoAgil.API.Models;
@@ -11,7 +12,7 @@ public static class IngredienteHandlers
     public static async Task<Results<NotFound, NoContent, Ok<IEnumerable<IngredienteDTO>>>> GetIngredientesAsync(
         RangoDbContext dbContext,
         IMapper mapper,
-        int id)
+        [FromRoute] int id)
     {
         var rango = await dbContext.Rangos
             .Include(r => r.Ingredientes)

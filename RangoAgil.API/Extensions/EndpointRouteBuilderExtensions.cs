@@ -1,4 +1,5 @@
-﻿using RangoAgil.API.EndpointHandlers;
+﻿using RangoAgil.API.EndpointFilters;
+using RangoAgil.API.EndpointHandlers;
 
 namespace RangoAgil.API.Extensions;
 
@@ -8,16 +9,20 @@ public static class EndpointRouteBuilderExtensions
     {
         var rangos = endpoints.MapGroup("/rangos");
         var rangosWithId = rangos.MapGroup("/{id:int}");
+        var rangosWithIdAndFilters = endpoints.MapGroup("/rangos/{id:int}")
+            .AddEndpointFilter(new RangoIsLockedFilter(5));
 
         rangos.MapGet("/", RangoHandlers.GetRangosAsync);
         // Without explicit docs
         rangosWithId.MapGet("", RangoHandlers.GetRangoById).WithName("GetRangoById");
 
-        rangos.MapPost("/", RangoHandlers.CreateRango);
+        rangos.MapPost("/", RangoHandlers.CreateRango)
+            .AddEndpointFilter<ValidadeAnnotationFilter>();
 
-        rangosWithId.MapPut("", RangoHandlers.UpdateRango);
+        rangosWithIdAndFilters.MapPut("", RangoHandlers.UpdateRango);
 
-        rangosWithId.MapDelete("", RangoHandlers.DeleteRango);
+        rangosWithIdAndFilters.MapDelete("", RangoHandlers.DeleteRango)
+            .AddEndpointFilter<LogNotFoundEndpointFilter>();
     }
 
     public static void MapIngredienteEndpoints(this IEndpointRouteBuilder endpoints)
